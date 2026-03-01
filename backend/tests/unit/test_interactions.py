@@ -24,3 +24,23 @@ def test_filter_returns_interaction_with_matching_ids() -> None:
     result = _filter_by_item_id(interactions, 1)
     assert len(result) == 1
     assert result[0].id == 1
+
+def test_filter_returns_empty_when_no_match() -> None:
+    """Test that filter returns empty list when no interactions match the item_id."""
+    interactions = [_make_log(1, 1, 1), _make_log(2, 2, 2), _make_log(3, 3, 3)]
+    result = _filter_by_item_id(interactions, 999)
+    assert result == []
+
+
+def test_filter_returns_multiple_matches() -> None:
+    """Test that filter returns all interactions with the same item_id."""
+    interactions = [
+        _make_log(1, 1, 1), 
+        _make_log(2, 2, 2),
+        _make_log(3, 1, 1),  # Same item_id as first
+        _make_log(4, 3, 1)   # Same item_id as first
+    ]
+    result = _filter_by_item_id(interactions, 1)
+    assert len(result) == 3
+    assert all(log.item_id == 1 for log in result)
+    assert {log.id for log in result} == {1, 3, 4}
